@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6F1">
+<meta name="description" content="Маленький личный квест — про нас.">
+<title>Родная моя девчонка</title>
+<style>
+:root{
+ --bg:#FAF6F1;--paper:#fffdfa;--ink:#35282F;--muted:#76636A;
+ --accent:#87465A;--accent2:#A96879;--powder:#F0E2E5;--line:#E4D5D8;
+ --ok:#47785d;--bad:#a94450;--radius:25px;--shadow:0 16px 42px rgba(67,40,49,.08)
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;min-height:100svh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;
+ background:radial-gradient(ellipse at 8% 0%,#f3e4e6 0,transparent 35%),radial-gradient(ellipse at 100% 95%,#eee2d5 0,transparent 30%),var(--bg)}
+button,input{font:inherit}
+button{touch-action:manipulation}
+.wrap{min-height:100svh;display:flex;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 16px calc(26px + env(safe-area-inset-bottom))}
+.top{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:3px 0 15px}
+.brand{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.counter{display:flex;gap:5px}
+.digit{width:29px;height:33px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;color:#b5a3a8;background:#fff9;font-weight:700}
+.digit.filled{background:var(--paper);border-color:var(--accent2);color:var(--ink)}
+.progress{width:100%;max-width:520px;height:3px;border-radius:99px;background:#e8dfe0;overflow:hidden;margin-bottom:19px}
+.progress-fill{height:100%;width:0;background:var(--accent);transition:width .25s}
+.card{width:100%;max-width:520px;padding:clamp(23px,6vw,38px);border:1px solid #fff;border-radius:var(--radius);background:rgba(255,253,250,.92);box-shadow:var(--shadow);text-align:center}
+.card.appear{animation:appear .22s ease both}
+@keyframes appear{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hidden{display:none!important}
+.eyebrow{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:750;margin-bottom:13px}
+h1,h2{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-weight:500;line-height:1.14;letter-spacing:-.02em;margin:0 0 17px}
+h1{font-size:clamp(2.4rem,10vw,3.55rem)}h2{font-size:clamp(2rem,8vw,2.75rem)}
+p{margin:0 0 15px}p:last-child{margin-bottom:0}
+.lead{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.35rem;line-height:1.4;color:var(--muted)}
+.small{font-size:.87rem;color:var(--muted)}
+.rule{height:1px;background:var(--line);margin:21px 0}
+.btn{width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;padding:13px 19px;margin-top:10px;border:1px solid var(--accent);border-radius:99px;background:var(--accent);color:white;font-weight:650;text-decoration:none;cursor:pointer}
+.btn:active{transform:scale(.99)}
+.btn.secondary{background:transparent;color:var(--accent);border-color:var(--line);box-shadow:none}
+.btn.text{min-height:40px;border:0;background:transparent;color:var(--accent);padding:7px;margin-top:6px;font-size:.9rem;font-weight:600}
+.answer{width:100%;min-height:54px;padding:12px 16px;border:1px solid #d8c5ca;border-radius:14px;background:white;color:var(--ink);text-align:center;font-size:1.1rem;outline:none}
+.answer:focus,.code-digit:focus{border-color:var(--accent);box-shadow:0 0 0 3px #87465a18}
+.feedback{min-height:24px;margin-top:9px;font-size:.9rem;font-weight:600}
+.good{color:var(--ok)}.bad{color:var(--bad)}
+.riddle{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.35rem;line-height:1.65;background:#f8eef0;border-radius:17px;padding:17px 13px;margin:18px 0;overflow-wrap:anywhere}
+.hint-box{padding:15px;background:#f8eef0;border-radius:15px;margin-top:10px}
+.hint-box p{margin:0}
+audio{width:100%;margin:10px 0 4px}
+.music-note{font-size:.85rem;color:var(--muted)}
+.code-row{display:flex;justify-content:center;gap:8px;margin:22px 0}
+.code-digit{width:min(18vw,58px);height:64px;border:1px solid #d8c5ca;border-radius:13px;background:#fff;text-align:center;font-size:1.75rem;color:var(--ink)}
+.footer{max-width:520px;margin-top:18px;text-align:center;color:#9a858b;font-size:.73rem}
+
+.scratch-wrap{position:relative;width:100%;margin:19px auto 12px;border-radius:12px;overflow:hidden;line-height:0;box-shadow:0 7px 22px rgba(67,40,49,.14);background:#ead9b6;touch-action:none;user-select:none;-webkit-user-select:none}
+.scratch-wrap img{display:block;width:100%;height:auto;pointer-events:none}
+#scratchCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+@media(min-width:600px){.wrap{padding-top:28px}.card{padding:40px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top" id="topbar">
+ <div class="brand">Только для тебя</div>
+ <div class="counter" id="counter" aria-label="Собранные цифры">
+  <span class="digit" id="d0">·</span><span class="digit" id="d1">·</span><span class="digit" id="d2">·</span><span class="digit" id="d3">·</span>
+ </div>
+</header>
+<div class="progress" id="progressWrap" aria-hidden="true"><div class="progress-fill" id="progress"></div></div>
+
+<section class="card" id="screen-start">
+ <div class="eyebrow">Маленький квест · только для тебя</div>
+ <h1>Родная моя девчонка</h1>
+ <p class="lead">Этот маленький квест — про нас.</p>
+ <p>Находи подсказки, собирай цифры и не спеши.</p>
+ <p class="small">Самое важное здесь — не скорость.</p>
+ <button class="btn" id="startButton" type="button">Начать</button>
+</section>
+
+<section class="card hidden" id="screen-bottle">
+ <div class="eyebrow">Первая находка</div><h2>Немного сладкого</h2>
+ <div class="riddle">Ты сладкая, я — нет.<br>Вместе мы — полусладкое.<br>Найди то, что подходит нам обоим.</div>
+ <p class="small">На бутылке спрятана первая цифра. Сотри защитный слой и введи её.</p>
+ <form id="bottleForm">
+  <input class="answer" id="bottleInput" inputmode="numeric" pattern="[0-9]*" maxlength="1" placeholder="Первая цифра" aria-label="Первая цифра" required>
+  <div class="feedback" id="bottleFeedback" aria-live="polite"></div>
+  <button class="btn" type="submit">Продолжить</button>
+ </form>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-speaker">
+ <div class="eyebrow">Следующая находка</div><h2>Слово спряталось</h2>
+ <p>В этой фразе спрятан предмет. Найди его в номере.</p>
+ <div class="riddle">Кот Однажды Ловко Обошёл Невидимую Картонную Арку.</div>
+ <p class="small">Первые буквы слов подскажут, что нужно найти.</p>
+ <button class="btn" id="foundSpeakerButton" type="button">Я нашла</button>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-music">
+ <div class="eyebrow">Музыкальная пауза</div><h2>А теперь — без загадок</h2>
+ <p class="lead">Просто побудь со мной.</p>
+ <p>Подключи телефон к JBL, если хочешь слушать через колонку, и нажми воспроизведение.</p>
+ <audio id="song" controls preload="metadata" playsinline>
+  <source src="./rodnaya-v2.mp3" type="audio/mpeg">
+  Твой браузер не поддерживает встроенное аудио.
+ </audio>
+ <p class="music-note" id="audioStatus" aria-live="polite">Когда песня закончится, под плеером появится возможность продолжить.</p>
+ <div class="feedback bad hidden" id="audioError" aria-live="polite"></div>
+ <div class="rule"></div>
+ <p class="small">После песни возвращайся сюда и нажми кнопку ниже. Следующая загадка не появится сама.</p>
+ <button class="btn" id="continueAfterSong" type="button">Песня закончилась — продолжить</button>
+</section>
+
+<section class="card hidden" id="screen-speakerDigit">
+ <div class="eyebrow">Сохраним твою находку</div><h2>Цифра с колонки</h2>
+ <p>Сотри защитный слой на колонке и введи цифру, которую нашла.</p>
+ <form id="speakerDigitForm">
+  <input class="answer" id="speakerDigitInput" inputmode="numeric" pattern="[0-9]*" maxlength="1" placeholder="Цифра с колонки" aria-label="Цифра с колонки" required>
+  <div class="feedback" id="speakerDigitFeedback" aria-live="polite"></div>
+  <button class="btn" type="submit">Продолжить</button>
+ </form>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-kiss">
+ <div class="eyebrow">Тот самый день</div><h2>Наш первый поцелуй</h2>
+ <p>Вспомни дату нашего первого поцелуя.</p>
+ <p>Сложи все цифры этой даты, а затем сложи цифры полученного числа, пока не останется одна цифра.</p>
+ <form id="kissForm">
+  <input class="answer" id="kissInput" inputmode="numeric" pattern="[0-9]*" maxlength="1" placeholder="Твоя цифра" aria-label="Твоя цифра" required>
+  <div class="feedback" id="kissFeedback" aria-live="polite"></div>
+  <button class="btn" type="submit">Продолжить</button>
+ </form>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-phrase">
+ <div class="eyebrow">Даже во сне</div><h2>Три слова</h2>
+ <p>Какую фразу ты прошептала во сне?</p><p>Сколько в ней слов?</p>
+ <form id="phraseForm">
+  <input class="answer" id="phraseInput" inputmode="numeric" pattern="[0-9]*" maxlength="1" placeholder="Количество слов" aria-label="Количество слов" required>
+  <div class="feedback" id="phraseFeedback" aria-live="polite"></div>
+  <button class="btn" type="submit">Продолжить</button>
+ </form>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-safeClue">
+ <div class="eyebrow">Последняя находка</div><h2>Расшифруй слово</h2>
+ <p>У каждой буквы русского алфавита есть свой порядковый номер.</p>
+ <p>Расшифруй последовательность:</p>
+ <div class="riddle"><strong>19 — 6 — 11 — 22</strong></div>
+ <p class="small">Не забудь про букву Ё.</p>
+ <form id="safeWordForm">
+  <input class="answer" id="safeWordInput" autocomplete="off" placeholder="Какое слово получилось?" aria-label="Ответ на финальную загадку" required>
+  <div class="feedback" id="safeWordFeedback" aria-live="polite"></div>
+  <button class="btn" type="submit">Продолжить</button>
+ </form>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-scratch">
+ <div class="eyebrow">Небольшое признание</div><h2>Сотри покрытие</h2>
+ <p class="lead">Иногда самое важное скрыто под поверхностью.</p>
+ <p class="small">Проводи пальцем по картинке, чтобы открыть то, что я приготовил для тебя.</p>
+ <div class="scratch-wrap" id="scratchWrap">
+  <img id="loveImage" src="./love-is-scratch.jpg" alt="Открытка «Любовь это… неделю готовить для неё подарок-квест»">
+  <canvas id="scratchCanvas" aria-label="Проведи пальцем, чтобы стереть защитный слой и открыть открытку"></canvas>
+ </div>
+ <p class="small" id="scratchStatus" aria-live="polite">Сотри покрытие пальцем. Картинка проявится под ним.</p>
+ <button class="btn" id="continueFromScratch" type="button" disabled>Теперь можно открыть сейф</button>
+</section>
+
+<section class="card hidden" id="screen-safe">
+ <div class="eyebrow">Четыре цифры — один сюрприз</div><h2>Введи собранный код</h2>
+ <p>Введи цифры в том порядке, в котором ты их нашла.</p>
+ <div class="code-row">
+  <input class="code-digit" id="c0" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Первая цифра кода">
+  <input class="code-digit" id="c1" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Вторая цифра кода">
+  <input class="code-digit" id="c2" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Третья цифра кода">
+  <input class="code-digit" id="c3" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Четвёртая цифра кода">
+ </div>
+ <div class="feedback" id="safeFeedback" aria-live="polite"></div>
+ <button class="btn" id="checkCodeButton" type="button">Проверить код</button>
+ <button class="btn text hintButton" type="button">Нужна подсказка?</button>
+ <div class="hint-box hidden"><p>Ты сама знаешь, как получить подсказку…</p><button class="btn secondary hintClose" type="button">Кажется, я вспомнила</button></div>
+</section>
+
+<section class="card hidden" id="screen-opened">
+ <div class="eyebrow">Последний шаг</div><h2>Твой сюрприз ждёт внутри</h2>
+ <p class="lead">Всё верно.</p>
+ <p>Теперь введи этот код на настоящем сейфе.</p>
+ <p>Твой сюрприз ждёт внутри.</p>
+ <button class="btn" id="openedSafeButton" type="button">Я открыла сейф</button>
+</section>
+
+<section class="card hidden" id="screen-finish">
+ <div class="eyebrow">Сейф открыт</div><h1>Родная моя девчонка</h1>
+ <p class="lead">Ты нашла всё!</p>
+ <p>Внутри — сертификат на 15 000 ₽ в «Золотое Яблоко» и несколько слов от меня.</p>
+ <div class="rule"></div><p>А теперь пусть весь мир немного подождёт.</p>
+</section>
+<footer class="footer" id="footer">Для тебя — с любовью и вниманием к каждой детали.</footer>
+</main>
+<script>
+(() => {
+"use strict";
+const STORAGE_KEY = "albinaQuestState_v2";
+const CODE = "6983";
+const screens = ["start","bottle","speaker","music","speakerDigit","kiss","phrase","safeClue","scratch","safe","opened","finish"];
+const progressMap = {start:0,bottle:1,speaker:2,music:3,speakerDigit:4,kiss:5,phrase:6,safeClue:7,scratch:8,safe:9,opened:10,finish:11};
+let current = "start";
+let found = ["","","",""];
+
+
+const $ = id => document.getElementById(id);
+function saveState(){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify({version:3,current,found}));}catch(e){}
+}
+function updateDigits(){
+ found.forEach((v,i)=>{const el=$("d"+i);el.textContent=v||"·";el.classList.toggle("filled",!!v);});
+}
+function showScreen(name){
+ if(!screens.includes(name)) name="start";
+ current=name;
+ screens.forEach(n=>{const el=$("screen-"+n);if(el)el.classList.toggle("hidden",n!==name);});
+ const isMusic=name==="music";
+ $("counter").classList.remove("hidden");
+ $("progressWrap").classList.toggle("hidden",name==="finish");
+ $("footer").classList.toggle("hidden",false);
+ $("progress").style.width=((progressMap[name]||0)/11*100)+"%";
+ document.querySelectorAll(".card").forEach(c=>c.classList.toggle("appear",!c.classList.contains("hidden")));
+ updateDigits();saveState();
+ if(name==="scratch")initScratch();
+ window.scrollTo({top:0,behavior:"auto"});
+}
+function setFeedback(id,message,kind){
+ const el=$(id);el.textContent=message;el.className="feedback "+(kind||"");
+}
+function acceptDigit(inputId,correct,index,feedbackId,next){
+ const input=$(inputId);const val=input.value.trim();
+ if(val===String(correct)){
+  found[index]=String(correct);updateDigits();setFeedback(feedbackId,"Цифра сохранена.", "good");saveState();
+  window.setTimeout(()=>showScreen(next),350);
+ }else{
+  setFeedback(feedbackId,val?"Пока не совпало. Попробуй ещё раз.":"Введи цифру, которую нашла.","bad");input.focus();input.select();
+ }
+}
+function acceptWord(inputId,correct,feedbackId,next){
+ const value=$(inputId).value.trim().toLocaleLowerCase("ru").replace(/ё/g,"е").replace(/[^а-я]/g,"");
+ const expected=correct.toLocaleLowerCase("ru").replace(/ё/g,"е");
+ if(value===expected){setFeedback(feedbackId,"Именно так.","good");window.setTimeout(()=>showScreen(next),350);}
+ else{setFeedback(feedbackId,"Пока не совпало. Попробуй ещё раз.","bad");$(inputId).focus();$(inputId).select();}
+}
+function checkCode(){
+ const val=[0,1,2,3].map(i=>$("c"+i).value).join("");
+ if(val===CODE){setFeedback("safeFeedback","Всё верно.","good");window.setTimeout(()=>showScreen("opened"),350);}
+ else{setFeedback("safeFeedback","Код пока не подошёл. Проверь порядок цифр — твои находки сохранены.","bad");}
+}
+function resetHintBoxes(){
+ document.querySelectorAll(".hint-box").forEach(el=>el.classList.add("hidden"));
+}
+function initHints(){
+ document.querySelectorAll(".hintButton").forEach(btn=>btn.addEventListener("click",()=>{
+  const box=btn.parentElement.querySelector(".hint-box");
+  if(box)box.classList.toggle("hidden");
+ }));
+ document.querySelectorAll(".hintClose").forEach(btn=>btn.addEventListener("click",()=>btn.closest(".hint-box").classList.add("hidden")));
+}
+
+let scratchInitialized = false;
+function initScratch(){
+ const canvas=$("scratchCanvas"), wrap=$("scratchWrap"), img=$("loveImage");
+ if(!canvas||!wrap||!img||scratchInitialized)return;
+ scratchInitialized=true;
+ const ctx=canvas.getContext("2d",{willReadFrequently:true});
+ let drawing=false, erasedSamples=0, lastCheck=0, finished=false;
+ function sizeCanvas(){
+  const rect=wrap.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(rect.width*dpr);
+  canvas.height=Math.round(rect.height*dpr);
+  ctx.globalCompositeOperation="source-over";
+  // Opaque warm parchment scratch coating with subtle speckles and fine texture.
+  ctx.fillStyle="#d8c6a2";ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="rgba(255,250,230,.20)";
+  for(let i=0;i<Math.min(1800,Math.floor(canvas.width*canvas.height/500));i++){
+   const x=Math.random()*canvas.width,y=Math.random()*canvas.height;
+   ctx.fillRect(x,y,1.2*dpr,1.2*dpr);
+  }
+  ctx.strokeStyle="rgba(104,79,48,.16)";ctx.lineWidth=1*dpr;
+  for(let y=8*dpr;y<canvas.height;y+=18*dpr){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y+Math.sin(y)*2*dpr);ctx.stroke();}
+  ctx.globalCompositeOperation="destination-out";
+  ctx.lineCap="round";ctx.lineJoin="round";
+  ctx.lineWidth=Math.max(34*dpr,Math.min(canvas.width,canvas.height)*.075);
+  finished=false;erasedSamples=0;
+  $("continueFromScratch").disabled=true;
+  $("scratchStatus").textContent="Сотри покрытие пальцем. Картинка проявится под ним.";
+ }
+ function point(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};
+ }
+ function scratch(e){
+  if(!drawing||finished)return;
+  const p=point(e);
+  ctx.beginPath();ctx.arc(p.x,p.y,ctx.lineWidth/2,0,Math.PI*2);ctx.fill();
+  erasedSamples++;
+  if(erasedSamples-lastCheck>=8){lastCheck=erasedSamples;checkProgress();}
+ }
+ function checkProgress(){
+  const w=canvas.width,h=canvas.height;
+  const data=ctx.getImageData(0,0,w,h).data;
+  const step=Math.max(4,Math.floor(Math.sqrt((w*h)/30000)));
+  let total=0,clear=0;
+  for(let y=0;y<h;y+=step){
+   for(let x=0;x<w;x+=step){
+    const a=data[(y*w+x)*4+3];total++;if(a<80)clear++;
+   }
+  }
+  const ratio=clear/Math.max(1,total);
+  if(ratio>=0.62&&!finished){
+   finished=true;
+   ctx.clearRect(0,0,w,h);
+   $("scratchStatus").textContent="Вот что я хотел тебе показать.";
+   $("continueFromScratch").disabled=false;
+  }else{
+   $("scratchStatus").textContent="Уже открыто "+Math.min(61,Math.round(ratio*100))+"%. Продолжай стирать.";
+  }
+ }
+ canvas.addEventListener("pointerdown",e=>{if(finished)return;drawing=true;canvas.setPointerCapture?.(e.pointerId);scratch(e);});
+ canvas.addEventListener("pointermove",scratch);
+ ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>canvas.addEventListener(ev,()=>{drawing=false;checkProgress();}));
+ img.addEventListener("load",sizeCanvas);
+ if(img.complete)sizeCanvas();
+ window.addEventListener("resize",()=>{if(!finished)sizeCanvas();});
+}
+function bind(){
+ $("startButton").addEventListener("click",()=>showScreen("bottle"));
+ $("foundSpeakerButton").addEventListener("click",()=>showScreen("music"));
+ $("continueAfterSong").addEventListener("click",()=>showScreen("speakerDigit"));
+ const audio=$("song");
+ audio.addEventListener("ended",()=>{
+  $("audioStatus").textContent="Песня закончилась. Нажми кнопку ниже, когда будешь готова продолжить.";
+  $("continueAfterSong").focus({preventScroll:true});
+  saveState();
+ });
+ audio.addEventListener("error",()=>{
+  $("audioError").textContent="Песня не загрузилась. Проверь, что index.html и rodnaya-v2.mp3 лежат в одной папке на GitHub Pages. Можно обновить страницу и попробовать снова.";
+  $("audioError").classList.remove("hidden");
+  $("audioStatus").textContent="Не удалось загрузить аудио.";
+ });
+ audio.addEventListener("play",()=>{
+  $("audioError").classList.add("hidden");
+  $("audioStatus").textContent="Песня играет. Когда закончится, нажми кнопку продолжения ниже.";
+ });
+ $("openedSafeButton").addEventListener("click",()=>showScreen("finish"));
+ $("continueFromScratch").addEventListener("click",()=>showScreen("safe"));
+ $("checkCodeButton").addEventListener("click",checkCode);
+ $("bottleForm").addEventListener("submit",e=>{e.preventDefault();acceptDigit("bottleInput",6,0,"bottleFeedback","speaker");});
+ $("speakerDigitForm").addEventListener("submit",e=>{e.preventDefault();acceptDigit("speakerDigitInput",9,1,"speakerDigitFeedback","kiss");});
+ $("kissForm").addEventListener("submit",e=>{e.preventDefault();acceptDigit("kissInput",8,2,"kissFeedback","phrase");});
+ $("phraseForm").addEventListener("submit",e=>{e.preventDefault();acceptDigit("phraseInput",3,3,"phraseFeedback","safeClue");});
+ $("safeWordForm").addEventListener("submit",e=>{e.preventDefault();acceptWord("safeWordInput","сейф","safeWordFeedback","scratch");});
+ [0,1,2,3].forEach(i=>{
+  const el=$("c"+i);
+  el.addEventListener("input",()=>{el.value=el.value.replace(/\D/g,"").slice(0,1);if(el.value&&i<3)$("c"+(i+1)).focus();});
+  el.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!el.value&&i>0)$("c"+(i-1)).focus();});
+ });
+ initHints();
+}
+function restore(){
+ try{
+  const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
+  if(s&&(s.version===2||s.version===3)&&Array.isArray(s.found)&&s.found.length===4){
+   found=s.found.map(x=>String(x||"").slice(0,1));
+   if(s.current&&screens.includes(s.current))current=s.current;
+  }
+ }catch(e){}
+ updateDigits();showScreen(current);
+ if(current==="music"){
+  $("audioStatus").textContent="Нажми воспроизведение. После песни нажми «Песня закончилась — продолжить».";
+ }
+}
+bind();restore();
+})();
+</script>
+</body>
+</html>
